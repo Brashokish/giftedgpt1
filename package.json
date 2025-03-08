@@ -9,7 +9,7 @@
     "lint": "next lint",
     "format:write": "prettier --write \"**/*.{css,js,json,jsx,ts,tsx}\"",
     "format": "prettier \"**/*.{css,js,json,jsx,ts,tsx}\"",
-    "postinstall": "prisma generate"  // Add if using Prisma
+    "postinstall": "prisma generate"  
   },
   "dependencies": {
     "@types/node": "20.3.1",
