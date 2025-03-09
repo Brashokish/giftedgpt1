@@ -1,11 +1,8 @@
-const express = require('express');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai"; // Import Google Generative AI client
+import { StreamingTextResponse } from "ai"; // Assuming you have a streaming response implementation
+import { functions, runFunction } from "./functions"; // Adjust as necessary for your functions
 
-const app = express();
-const port = 8080;
-const host = '0.0.0.0';
-
-const apiKey = "AIzaSyDL8lTQK78cwDfySVT_8JDbDXkgJyUcfV4"; // Replace with your actual API key
+const apiKey = process.env.GOOGLE_API_KEY; // Use environment variables for security
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
@@ -48,7 +45,7 @@ app.route('/gpt')
 
     try {
       const prompt = `${SYSTEM_INSTRUCTION}\n\nHuman: ${query}`;
-      const result = await model.generateContent(prompt);
+      const result = await model.generateContent({ prompt }); // Pass prompt as an object
       const response = result?.response?.candidates?.[0]?.content || "No response generated.";
       return res.status(200).send(response);
     } catch (e) {
@@ -65,7 +62,7 @@ app.route('/gpt')
 
     try {
       const prompt = `${SYSTEM_INSTRUCTION}\n\nHuman: ${query}`;
-      const result = await model.generateContent(prompt);
+      const result = await model.generateContent({ prompt }); // Pass prompt as an object
       const response = result?.response?.candidates?.[0]?.content || "No response generated.";
       return res.status(200).send(response);
     } catch (e) {
