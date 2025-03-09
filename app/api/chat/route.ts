@@ -1,16 +1,15 @@
 import { kv } from "@vercel/kv";
 import { Ratelimit } from "@upstash/ratelimit";
-import { OpenAI } from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai"; // Import Google Generative AI client
 import {
-  OpenAIStream,
+  GoogleStream,
   StreamingTextResponse,
-} from "ai";
+} from "ai"; // Assuming you have a Google stream implementation
 import { functions, runFunction } from "./functions";
 
-// Create an OpenAI API client (that's edge friendly!)
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize the API key directly
+const apiKey = "AIzaSyDL8lTQK78cwDfySVT_8JDbDXkgJyUcfV4"; // Your Google API key
+const genAI = new GoogleGenerativeAI(apiKey); // Create a Google Generative AI client
 
 export const runtime = "edge";
 
@@ -44,24 +43,27 @@ export async function POST(req: Request) {
 
   const { messages } = await req.json();
 
-  // check if the conversation requires a function call to be made
-  const initialResponse = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo-0613",
+  // Get the generative model
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash", // Use the specific Gemini model
+  });
+
+  // Check if the conversation requires a function call to be made
+  const initialResponse = await model.chat.completions.create({
     messages,
     stream: true,
     functions,
     function_call: "auto",
   });
 
-  const stream = OpenAIStream(initialResponse, {
+  const stream = GoogleStream(initialResponse, {
     experimental_onFunctionCall: async (
       { name, arguments: args },
       createFunctionCallMessages,
     ) => {
       const result = await runFunction(name, args);
       const newMessages = createFunctionCallMessages(result);
-      return openai.chat.completions.create({
-        model: "gpt-3.5-turbo-0613",
+      return model.chat.completions.create({
         stream: true,
         messages: [...messages, ...newMessages],
       });
