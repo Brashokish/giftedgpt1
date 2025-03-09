@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"; // Import Google Generative AI client
-import { StreamingTextResponse } from "ai"; // Assuming you have a streaming response implementation
+//import { StreamingTextResponse } from "ai"; // Assuming you have a streaming response implementation
 import { functions, runFunction } from "./functions"; // Adjust as necessary for your functions
 
 const apiKey = process.env.GOOGLE_API_KEY; // Use environment variables for security
